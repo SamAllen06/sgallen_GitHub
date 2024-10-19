@@ -58,3 +58,4 @@ def doFight(personOne, personTwo):
             personTwo.health = personTwo.health - totalDamage
         print(f"{personTwo.name} now has {personTwo.health} health left!")
     return personTwo.health
+

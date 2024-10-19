@@ -2,13 +2,13 @@ import tbcModule
 def main():
     c1 = tbcModule.Character()
     c1.name = input("What would you like to name your character? ")
-    c1.health = tbcModule.testInt(c1.name, "health", "hitPoints", 0, 100)
+    c1.health = tbcModule.testInt(c1.name, "health", "hitPoints", 1, 100)
     c1.maxDamage = tbcModule.testInt(c1.name, "strength", "maxDamage", 0, 100)
     c1.hitChance = tbcModule.testInt(c1.name, "success rate", "hitChance", 0, 100)
     c1.armor = tbcModule.testInt(c1.name, "armor absorption", "armor", 0, 100)
     c2 = tbcModule.Character()
     c2.name = "The Monster"
-    c2.health = tbcModule.testInt("the monster", "health", "hitpoints", 0, 100)
+    c2.health = tbcModule.testInt("the monster", "health", "hitpoints", 1, 100)
     c2.maxDamage = tbcModule.testInt("the monster", "strength", "maxDamage", 0, 100)
     c2.hitChance = tbcModule.testInt("the monster", "success rate", "hitChance", 0, 100)
     c2.armor = tbcModule.testInt("the monster", "armor absorption", "armor", 0, 100)
@@ -32,8 +32,9 @@ def main():
         nextRound = input("Proceed in the fight? (Y/N) ")
         print()
         if nextRound.upper() == "N":
+            print("Now exiting the combat game. ")
             keepGoing = False
-        if nextRound.upper() == "Y":
+        elif nextRound.upper() == "Y":
             c2.health = tbcModule.doFight(c1, c2)
             c1.health = tbcModule.doFight(c2, c1)
         else:
