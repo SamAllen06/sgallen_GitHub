@@ -13,7 +13,7 @@ class Mushroom(simpleGE.Sprite):
         
     def reset(self):
         #move to top of the screen
-        self.y = -100
+        self.y = -150
         
         #x is random from 22 to screen width minus 22
         self.x = random.randint(22, self.screenWidth-22)
@@ -45,10 +45,16 @@ class Game(simpleGE.Scene):
         self.setImage("mountainBackground.jpg")
         self.ronald = Ronald(self)
         self.mushroom = Mushroom(self)
+        self.sndMushroom = simpleGE.Sound("mushroom.wav")
         
         self.sprites = [self.ronald, self.mushroom]
         
-    
+    def process(self):
+        if self.mushroom.collidesWith(self.ronald):
+            self.mushroom.reset()
+            self.sndMushroom.play()
+            
+        
         
 def main():
     game = Game()
