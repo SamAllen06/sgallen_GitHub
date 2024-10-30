@@ -43,19 +43,21 @@ class Game(simpleGE.Scene):
     def __init__(self):
         super().__init__()
         self.setImage("mountainBackground.jpg")
+        self.numMushrooms = 5
         self.ronald = Ronald(self)
-        self.mushroom = Mushroom(self)
+        self.mushrooms = []
+        for i in range(self.numMushrooms):
+            self.mushrooms.append(Mushroom(self))
         self.sndMushroom = simpleGE.Sound("mushroom.wav")
         
-        self.sprites = [self.ronald, self.mushroom]
+        self.sprites = [self.ronald, self.mushrooms]
         
     def process(self):
-        if self.mushroom.collidesWith(self.ronald):
-            self.mushroom.reset()
-            self.sndMushroom.play()
-            
-        
-        
+        for mushroom in self.mushrooms:
+            if mushroom.collidesWith(self.ronald):
+                mushroom.reset()
+                self.sndMushroom.play()
+
 def main():
     game = Game()
     game.start()
