@@ -80,26 +80,57 @@ class Game(simpleGE.Scene):
                 #score +=1
                 #simpleGE.LblScore.update(self)
 
-class LblInstructions(simpleGE.Label):
+class LblInstructions(simpleGE.MultiLabel):
     def __init__(self, fontName, totalTime = 10):
         super().__init__()
-        self.text = f"In this game you will play as Ronald, the adorable felt creature! Ronald is always extremely hungry and eats a rare type of mushroom that falls from the sky! Use the left and right arrow keys to catch as many mushrooms as you can and help Ronald survive!"
-        self.bgColor = ((200, 0, 150))
-        self.center = (320, 240)
-        self.size = (200, 100)
+        self.textLines = "In this game you will play as Ronald, the", "adorable felt creature! Ronald is always", "extremely hungry and eats a rare type of", "mushroom that falls from the sky! Use the left", "and right arrow keys to catch as many", "mushrooms as you can and help Ronald survive!"
+        self.bgColor = ((0, 150, 0))
+        self.center = (320, 140)
+        self.size = (490, 200)
+        
+class PlayButton(simpleGE.Button):
+    def __init__(self, fontName):
+        super().__init__()
+        self.fgColor = (0x00, 0x00, 0x00)
+        self.bgColor = (0xCC, 0xCC, 0xCC)
+        self.text = "Play!"
+        self.bgColor = ((250, 50, 250))
+        self.center = (150, 400)
+        self.size = (150, 35)
 
-# class Instructions(simpleGE.Sprite):
-#      def __init__(self, scene):
-#          super().__init__(scene)
-#          self.setImage("mountainBackground.jpg")
+class QuitButton(simpleGE.Button):
+    def __init__(self, fontName):
+        super().__init__()
+        self.fgColor = (0x00, 0x00, 0x00)
+        self.bgColor = (0xCC, 0xCC, 0xCC)
+        self.text = "Quit"
+        self.bgColor = ((150, 0, 150))
+        self.center = (490, 400)
+        self.size = (150, 35)
 
+class Introduction(simpleGE.Scene):
+    def __init__(self):
+        super().__init__()
+        self.setImage("mountainBackground.jpg")
+        self.lblInstructions = LblInstructions(self)
+        self.playButton = PlayButton(self)
+        self.quitButton = QuitButton(self)
+        self.sprites = [self.lblInstructions, self.playButton, self.quitButton]
+        nextStage = "Nothing"
+        if self.quitButton.active == True:
+            nextStage = "Quit"
+        if self.playButton.active == "True":
+            nextStage = "Play"
+        #return nextStage
+            
          
 
 def main():
     keepGoing = True
     score = 0
     while keepGoing:
-#         instructions = Instructions(score)
+        introduction = Introduction()
+        introduction.start()
         game = Game()
         game.start()
 
