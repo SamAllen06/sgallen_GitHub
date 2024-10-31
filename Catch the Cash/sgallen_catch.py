@@ -13,7 +13,7 @@ class Mushroom(simpleGE.Sprite):
         
     def reset(self):
         #move to top of the screen
-        self.y = -150
+        self.y = random.randint(-200, -100)
         
         #x is random from 22 to screen width minus 22
         self.x = random.randint(22, self.screenWidth-22)
@@ -35,10 +35,29 @@ class Ronald(simpleGE.Sprite):
         
     def process(self):
         if self.isKeyPressed(pygame.K_LEFT):
-            self.x -= self.moveSpeed
+            if self.x > 25:
+                self.x -= self.moveSpeed
         if self.isKeyPressed(pygame.K_RIGHT):
-            self.x += self.moveSpeed
+            if self.x < self.screenWidth-25:
+                self.x += self.moveSpeed
+
+class LblScore(simpleGE.Label):
+    def __init__(self, fontName, score = 0):
+        super().__init__()
+        self.text = f"Score: {score}"
+        self.bgColor = ((200, 100, 0))
+        self.center = (90, 30)
         
+class LblTime(simpleGE.Label):
+    def __init__(self, fontName, totalTime = 10):
+        #elapsedTime = simpleGE.Timer.getTimeLeft
+        #totalTime = elapsedTime
+        super().__init__()
+        self.text = f"Time Left: {totalTime}"
+        self.bgColor = ((200, 0, 150))
+        self.center = (550, 30)
+        
+
 class Game(simpleGE.Scene):
     def __init__(self):
         super().__init__()
@@ -49,18 +68,40 @@ class Game(simpleGE.Scene):
         for i in range(self.numMushrooms):
             self.mushrooms.append(Mushroom(self))
         self.sndMushroom = simpleGE.Sound("mushroom.wav")
-        
-        self.sprites = [self.ronald, self.mushrooms]
+        self.lblScore = LblScore(self)
+        self.lblTime = LblTime(self)
+        self.sprites = [self.ronald, self.mushrooms, self.lblScore, self.lblTime]
         
     def process(self):
         for mushroom in self.mushrooms:
             if mushroom.collidesWith(self.ronald):
                 mushroom.reset()
                 self.sndMushroom.play()
+                #score +=1
+                #simpleGE.LblScore.update(self)
+
+class LblInstructions(simpleGE.Label):
+    def __init__(self, fontName, totalTime = 10):
+        super().__init__()
+        self.text = f"In this game you will play as Ronald, the adorable felt creature! Ronald is always extremely hungry and eats a rare type of mushroom that falls from the sky! Use the left and right arrow keys to catch as many mushrooms as you can and help Ronald survive!"
+        self.bgColor = ((200, 0, 150))
+        self.center = (320, 240)
+        self.size = (200, 100)
+
+# class Instructions(simpleGE.Sprite):
+#      def __init__(self, scene):
+#          super().__init__(scene)
+#          self.setImage("mountainBackground.jpg")
+
+         
 
 def main():
-    game = Game()
-    game.start()
+    keepGoing = True
+    score = 0
+    while keepGoing:
+#         instructions = Instructions(score)
+        game = Game()
+        game.start()
 
 if __name__ == "__main__":
     main()
