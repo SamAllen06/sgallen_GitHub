@@ -1493,3 +1493,8 @@ if __name__ == "__main__":
         
     game = Scene()
     game.start()
+    
+    
+    
+    
+    

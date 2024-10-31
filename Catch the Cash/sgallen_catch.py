@@ -116,14 +116,17 @@ class Introduction(simpleGE.Scene):
         self.playButton = PlayButton(self)
         self.quitButton = QuitButton(self)
         self.sprites = [self.lblInstructions, self.playButton, self.quitButton]
-        nextStage = "Nothing"
-        if self.quitButton.active == True:
-            nextStage = "Quit"
-        if self.playButton.active == "True":
-            nextStage = "Play"
-        #return nextStage
-            
-         
+        
+    def buttonChoice(self):
+        nextStage = ""
+        if self.quitButton.clicked == True:
+            nextStage = "quit"
+        if self.playButton.clicked == True:
+            nextStage = "play"
+        print (nextStage)
+        self.playButton.update()
+        self.quitButton.update()
+        return nextStage
 
 def main():
     keepGoing = True
@@ -131,9 +134,12 @@ def main():
     while keepGoing:
         introduction = Introduction()
         introduction.start()
-        game = Game()
-        game.start()
-
+        nextStage = introduction.buttonChoice()
+        if nextStage == "play":
+            game = Game()
+            game.start()
+        if nextStage == "quit":
+            keepGoing = False
 if __name__ == "__main__":
     main()
         
