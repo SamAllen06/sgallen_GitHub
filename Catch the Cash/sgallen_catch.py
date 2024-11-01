@@ -49,15 +49,19 @@ class LblScore(simpleGE.Label):
         self.center = (90, 30)
         
 class LblTime(simpleGE.Label):
-    def __init__(self, fontName, totalTime = 10):
-        #elapsedTime = simpleGE.Timer.getTimeLeft
-        #totalTime = elapsedTime
+    def __init__(self, fontName):        
         super().__init__()
-        self.text = f"Time Left: {totalTime}"
+        self.totalTime = 20
+        self.timer = simpleGE.Timer()
         self.bgColor = ((200, 0, 150))
         self.center = (550, 30)
+        self.update()
+    
+    def update(self):
+        timeLeft = int(self.totalTime+1-self.timer.getElapsedTime())
+        self.text = f"Time Left: {timeLeft}"
+        super().update()
         
-
 class Game(simpleGE.Scene):
     def __init__(self):
         super().__init__()
@@ -68,18 +72,21 @@ class Game(simpleGE.Scene):
         for i in range(self.numMushrooms):
             self.mushrooms.append(Mushroom(self))
         self.sndMushroom = simpleGE.Sound("mushroom.wav")
+        self.score = 0
         self.lblScore = LblScore(self)
         self.lblTime = LblTime(self)
         self.sprites = [self.ronald, self.mushrooms, self.lblScore, self.lblTime]
+        self.lblTime.update()
         
     def process(self):
         for mushroom in self.mushrooms:
             if mushroom.collidesWith(self.ronald):
                 mushroom.reset()
                 self.sndMushroom.play()
-                #score +=1
-                #simpleGE.LblScore.update(self)
-
+                self.score +=1
+                self.lblScore.text = f"Score: {self.score}"
+                self.lblScore.update()
+                
 class LblInstructions(simpleGE.MultiLabel):
     def __init__(self, fontName, totalTime = 10):
         super().__init__()
@@ -119,6 +126,8 @@ class Introduction(simpleGE.Scene):
         
     def buttonChoice(self):
         nextStage = ""
+        self.playButton.update()
+        self.quitbutton.update()
         if self.quitButton.clicked == True:
             nextStage = "quit"
         if self.playButton.clicked == True:
@@ -131,15 +140,19 @@ class Introduction(simpleGE.Scene):
 def main():
     keepGoing = True
     score = 0
-    while keepGoing:
-        introduction = Introduction()
-        introduction.start()
-        nextStage = introduction.buttonChoice()
-        if nextStage == "play":
-            game = Game()
-            game.start()
-        if nextStage == "quit":
-            keepGoing = False
+    game = Game()
+    game.start()
+
+#     while keepGoing:
+#         introduction = Introduction()
+#         introduction.start()
+#         nextStage = introduction.buttonChoice()
+#         if nextStage == "play":
+#             game = Game()
+#             game.start()
+#         if nextStage == "quit":
+#             keepGoing = False        
+            
 if __name__ == "__main__":
     main()
         
