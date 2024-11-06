@@ -42,51 +42,49 @@ class Ronald(simpleGE.Sprite):
                 self.x += self.moveSpeed
 
 class LblScore(simpleGE.Label):
-    def __init__(self, fontName, score = 0):
+    def __init__(self):
         super().__init__()
-        self.text = f"Score: {score}"
+        self.text = f"Score: 0"
         self.bgColor = ((200, 100, 0))
         self.center = (90, 30)
-        
+
 class LblTime(simpleGE.Label):
-    def __init__(self, fontName):        
+    def __init__(self):
         super().__init__()
-        self.totalTime = 20
-        self.timer = simpleGE.Timer()
-        self.bgColor = ((200, 0, 150))
+        self.text = "Time left: 15"
         self.center = (550, 30)
-        self.update()
-    
-    def update(self):
-        timeLeft = int(self.totalTime+1-self.timer.getElapsedTime())
-        self.text = f"Time Left: {timeLeft}"
-        super().update()
         
 class Game(simpleGE.Scene):
     def __init__(self):
         super().__init__()
         self.setImage("mountainBackground.jpg")
-        self.numMushrooms = 5
+        self.numMushrooms = 7
         self.ronald = Ronald(self)
         self.mushrooms = []
         for i in range(self.numMushrooms):
             self.mushrooms.append(Mushroom(self))
         self.sndMushroom = simpleGE.Sound("mushroom.wav")
         self.score = 0
-        self.lblScore = LblScore(self)
-        self.lblTime = LblTime(self)
+        self.timer = simpleGE.Timer()
+        self.timer.totalTime = 15
+        self.lblTime = LblTime()
+        self.lblScore = LblScore()
         self.sprites = [self.ronald, self.mushrooms, self.lblScore, self.lblTime]
-        self.lblTime.update()
         
     def process(self):
         for mushroom in self.mushrooms:
             if mushroom.collidesWith(self.ronald):
                 mushroom.reset()
                 self.sndMushroom.play()
-                self.score +=1
+                self.score += 1
                 self.lblScore.text = f"Score: {self.score}"
                 self.lblScore.update()
-                
+        
+        self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.1f}"
+        if self.timer.getTimeLeft() <= 0:
+            print(f"Score: {self.score}")
+            self.stop()
+        
 class LblInstructions(simpleGE.MultiLabel):
     def __init__(self, fontName, totalTime = 10):
         super().__init__()
