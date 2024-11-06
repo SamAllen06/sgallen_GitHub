@@ -24,6 +24,36 @@ class Mushroom(simpleGE.Sprite):
     def checkBounds(self):
         if self.top > self.screenHeight:
             self.reset()
+        
+class GreenMushroom(simpleGE.Sprite):
+    def __init__(self, scene):
+        super().__init__(scene)
+        self.setImage("greenMushroom.png")
+        self.setSize(44, 58)
+        self.minSpeedY = 3
+        self.minSpeedX = -8
+        self.maxSpeed = 8
+        self.reset()
+        
+    def reset(self):
+        #move to top of the screen
+        self.y = random.randint(-200, -100)
+        
+        #dy is a random minSpeed to maxSpeed
+        self.dy = random.randint(self.minSpeedY, self.maxSpeed)
+        self.dx = random.randint(self.minSpeedX, self.maxSpeed)
+        
+        #determine where it spawns
+        if self.dx > 0:
+            self.x = random.randint(-320, 320)
+        if self.dx == 0:
+            self.x = random.randint(0, 640)
+        else:
+            self.x = random.randint(320, 960)
+    
+    def checkBounds(self):
+        if self.top > self.screenHeight:
+            self.reset()
 
 class Ronald(simpleGE.Sprite):
     def __init__(self, scene):
@@ -61,15 +91,17 @@ class Game(simpleGE.Scene):
         self.numMushrooms = 8
         self.ronald = Ronald(self)
         self.mushrooms = []
+        self.greenMushrooms = []
         for i in range(self.numMushrooms):
             self.mushrooms.append(Mushroom(self))
         self.sndMushroom = simpleGE.Sound("mushroom.wav")
+        self.sndGreenMushroom = simpleGE.Sound("greenMushroom.wav")
         self.score = 0
         self.timer = simpleGE.Timer()
         self.timer.totalTime = 20
         self.lblTime = LblTime()
         self.lblScore = LblScore()
-        self.sprites = [self.ronald, self.mushrooms, self.lblScore, self.lblTime]
+        self.sprites = [self.ronald, self.mushrooms, self.lblScore, self.lblTime, self.greenMushrooms]
         
     def process(self):
         for mushroom in self.mushrooms:
@@ -77,9 +109,19 @@ class Game(simpleGE.Scene):
                 mushroom.reset()
                 self.sndMushroom.play()
                 self.score += 1
+                self.greenMushrooms.append(GreenMushroom(self))
+                self.timer.totalTime += 1
                 self.lblScore.text = f"Score: {self.score}"
                 self.lblScore.update()
-                                
+                print(self.sprites)
+                
+        for greenMushroom in self.greenMushrooms:
+            if greenMushroom.collidesWith(self.ronald):
+                self.greenMushrooms.append(GreenMushroom(self))
+                greenMushroom.reset()
+                self.sndGreenMushroom.play()
+                self.timer.totalTime -= 2
+                
         self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.0f}"
         if self.timer.getTimeLeft() <= 0:
             self.stop()
@@ -93,7 +135,10 @@ class LblInstructions(simpleGE.MultiLabel):
         "extremely hungry and eats a rare type of",
         "red mushroom that falls from the sky! Use the",
         "left and right arrow keys to catch as many red",
-        "mushrooms as you can and extend Ronald's life!",]
+        "mushrooms as you can and extend Ronald's life!",
+        "But make sure to dodge the poisonous, green",
+        "mushrooms that shorten his life! But remember,",
+        "every mushroom you eat spawns a poisonous one!"]
         self.bgColor = ((0, 150, 0))
         self.center = (320, 150)
         self.size = (500, 280)
