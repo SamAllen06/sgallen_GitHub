@@ -1,6 +1,6 @@
 import pygame, simpleGE, random
 
-"""Catch the cash game demo"""
+"""Catch the cash game demo, set number of enemies"""
 
 class Mushroom(simpleGE.Sprite):
     def __init__(self, scene):
@@ -30,9 +30,9 @@ class GreenMushroom(simpleGE.Sprite):
         super().__init__(scene)
         self.setImage("greenMushroom.png")
         self.setSize(44, 58)
-        self.minSpeedY = 3
-        self.minSpeedX = -8
-        self.maxSpeed = 8
+        self.minSpeedY = 4
+        self.minSpeedX = -10
+        self.maxSpeed = 10
         self.reset()
         
     def reset(self):
@@ -89,11 +89,14 @@ class Game(simpleGE.Scene):
         super().__init__()
         self.setImage("mountainBackground.jpg")
         self.numMushrooms = 8
+        self.numGreenMushrooms = 20
         self.ronald = Ronald(self)
         self.mushrooms = []
-        self.greenMushrooms = []
         for i in range(self.numMushrooms):
             self.mushrooms.append(Mushroom(self))
+        self.greenMushrooms = []
+        for i in range(self.numGreenMushrooms):
+            self.greenMushrooms.append(GreenMushroom(self))
         self.sndMushroom = simpleGE.Sound("mushroom.wav")
         self.sndGreenMushroom = simpleGE.Sound("greenMushroom.wav")
         self.score = 0
@@ -109,23 +112,20 @@ class Game(simpleGE.Scene):
                 mushroom.reset()
                 self.sndMushroom.play()
                 self.score += 1
-                self.greenMushrooms.append(GreenMushroom(self))
                 self.timer.totalTime += 1
                 self.lblScore.text = f"Score: {self.score}"
                 self.lblScore.update()
-                print(self.sprites)
                 
         for greenMushroom in self.greenMushrooms:
             if greenMushroom.collidesWith(self.ronald):
-                self.greenMushrooms.append(GreenMushroom(self))
                 greenMushroom.reset()
                 self.sndGreenMushroom.play()
-                self.timer.totalTime -= 2
-                
+                self.timer.totalTime -= 3
+    
         self.lblTime.text = f"Time Left: {self.timer.getTimeLeft():.0f}"
         if self.timer.getTimeLeft() <= 0:
             self.stop()
-        
+                    
 class LblInstructions(simpleGE.MultiLabel):
     def __init__(self, fontName, totalTime = 10):
         super().__init__()
@@ -137,8 +137,8 @@ class LblInstructions(simpleGE.MultiLabel):
         "left and right arrow keys to catch as many red",
         "mushrooms as you can and extend Ronald's life!",
         "But make sure to dodge the poisonous, green",
-        "mushrooms that shorten his life! But remember,",
-        "every mushroom you eat spawns a poisonous one!"]
+        "mushrooms that shorten his life! But every good",
+        "mushroom you eat spawns a new poisonous one!"]
         self.bgColor = ((0, 150, 0))
         self.center = (320, 150)
         self.size = (500, 280)
