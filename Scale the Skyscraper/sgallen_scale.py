@@ -213,6 +213,8 @@ class Instructions(simpleGE.Scene):
             self.sprites = [self.lblInstructions, self.btnPlay, self.btnQuit, self.sliderBar, self.sammSlider]
         except:
             if self.prevProgress == "win":
+                self.sndVictory = simpleGE.Sound("victory.wav")
+                self.sndVictory.play()
                 self.prevProgress = 640
                 self.sprites = [self.lblInstructions, self.btnPlay, self.btnQuit, self.victory]
 
@@ -737,8 +739,6 @@ class BossFight(simpleGE.Scene):
         self.sndDies = simpleGE.Sound("dies.wav")
         self.sndButton = simpleGE.Sound("dies.wav")
 #         self.sndButton = simpleGE.Sound("button.wav")
-        self.sndVictory = simpleGE.Sound("dies.wav")
-#         self.sndVictory = simpleGE.Sound("victory.wav")
         
         self.samm = Character(self, response)
         
@@ -830,7 +830,6 @@ class BossFight(simpleGE.Scene):
         if self.samm.collidesWith(self.button8):
             self.buttonPushing(self.button8)
         if self.buttonPushes == 8:
-            self.sndVictory.play()
             self.response = "instructions"
             self.win = "win"
             self.stop()
