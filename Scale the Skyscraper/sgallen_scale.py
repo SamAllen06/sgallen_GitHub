@@ -1,7 +1,6 @@
 import pygame, simpleGE
 
 """to fix:
-change button, door, victory to correct ones
 sound doesn't happen if you hit the door from the wrong side
 sound doesn't always happen if an enemy kills you"""
 
@@ -91,7 +90,7 @@ class CharacterSlider(simpleGE.Sprite):
         self.setSize(35, 105)
         
     def checkBounds(self):
-        checkbounds = "overwriting checkbounds"
+        pass
     
     def process(self):
         if self.y <5:
@@ -122,7 +121,7 @@ class Character(simpleGE.Sprite):
         self.walking = False
     
     def checkBounds(self):
-        checkbounds = "overwriting checkbounds"
+        pass
 
     def process(self):
         if self.overrideControls != True:
@@ -235,20 +234,24 @@ class Cloud(simpleGE.Sprite):
         self.position = (107, 60)
         self.sndStop = simpleGE.Sound("stop.wav")
         self.playSound = False
+        self.overrideControls = False
         
     def process(self):
-        self.setBoundAction(self.CONTINUE)
-        if self.rect.left >= 640:
-            self.x = -107
-        if self.mouseOver == False:
-            self.playSound = True
-        if self.mouseOver:
-            if self.playSound == True:
-                self.sndStop.play()
-            self.playSound = False
+        if self.overrideControls == False:
+            self.setBoundAction(self.CONTINUE)
+            if self.rect.left >= 640:
+                self.x = -107
+            if self.mouseOver == False:
+                self.playSound = True
+            if self.mouseOver:
+                if self.playSound == True:
+                    self.sndStop.play()
+                self.playSound = False
+                self.dx = 0
+            else:
+                self.dx = self.moveSpeed
+        if self.overrideControls == True:
             self.dx = 0
-        else:
-            self.dx = self.moveSpeed
 
 class Begin(simpleGE.Scene):
     def __init__(self, response):
@@ -257,8 +260,8 @@ class Begin(simpleGE.Scene):
         pygame.display.set_caption(self.response)
         self.setImage("outsideBackground.png")
         self.timer = simpleGE.Timer()
-#         sndDoor = simpleGE.Sound("door.wav")
-        self.sndDoor = simpleGE.Sound("dies.wav")
+        self.sndDoor = simpleGE.Sound("door.wav")
+#         self.sndDoor = simpleGE.Sound("dies.wav")
         
         self.samm = Character(self, response)
         
@@ -279,14 +282,16 @@ class Begin(simpleGE.Scene):
     def process(self):
         if self.samm.overrideControls != True:
             if self.samm.collidesWith(self.door):
+                self.sndDoor.play()
                 self.samm.overrideControls = True
+                self.cloud.overrideControls = True
                 self.response = "play"
-                self.timer.totalTime = 2
+                self.timer.totalTime = 4
                 self.samm.x -= self.samm.dx
                 self.samm.y -= self.samm.dy
                 self.samm.dx = 0
                 self.samm.dy = 0
-                self.sndDoor.play()
+
             if self.samm.collidesWith(self.ground):
                 self.samm.y -= self.samm.dy
                 self.samm.inAir = False
@@ -312,7 +317,7 @@ class Enemy(simpleGE.Sprite):
         self.animRow3 = 3
     
     def checkBounds(self):
-        checkbounds = "overwriting checkbounds"
+        pass
         
     def process(self):
         self.dx = self.walkDirection
@@ -372,7 +377,7 @@ class Platform(simpleGE.Sprite):
         self.inAir = False
         
     def checkBounds(self):
-        checkbounds = "overwriting checkbounds"
+        pass
         
     def process(self):
         if self.response == "play":
@@ -401,9 +406,9 @@ class Play(simpleGE.Scene):
         self.background.fill((120, 180, 255))
         self.timer = simpleGE.Timer()
         self.towerHeight = towerHeight
+        self.dead = False
         
-        self.sndDoor = simpleGE.Sound("dies.wav")
-#         self.sndDoor = simpleGE.Sound("door.wav")
+        self.sndDoor = simpleGE.Sound("door.wav")
         self.sndDies = simpleGE.Sound("dies.wav")
         
         self.sliderBar = SliderBar(self, response)
@@ -615,17 +620,16 @@ class Play(simpleGE.Scene):
             self.bounceOff(self.platform7)
 
         if self.samm.collidesWith(self.door):
+            self.sndDoor.play()
             self.response = "bossFight"
-            self.timer.totalTime = 2
+            self.timer.totalTime = 4
             self.samm.overrideControls = True
             self.samm.x -= self.samm.dx
             self.samm.y -= self.samm.dy
             self.samm.dx = 0
             self.samm.dy = 0
-            self.sndDoor.play()
-        if self.timer.getTimeLeft() <= 0:
-            self.stop()
         if self.samm.collidesWith(self.enemy1) or self.samm.collidesWith(self.enemy2) or self.samm.collidesWith(self.enemy3) or self.samm.collidesWith(self.enemy4) or self.samm.collidesWith(self.enemy5) or self.samm.collidesWith(self.enemy6):
+            self.dead = True
             self.response = "instructions"
             self.sndDies.play()
             self.samm.overrideControls = True
@@ -638,6 +642,10 @@ class Play(simpleGE.Scene):
             self.ground.dy = self.enemy1.dy = self.enemy2.dy = self.enemy3.dy = self.enemy4.dy = self.enemy5.dy = self.enemy6.dy = self.platform1.dy = self.platform2.dy = self.platform3.dy = self.platform4.dy = self.platform5.dy = self.platform6.dy = self.platform7.dy = 0
         if self.ground.dy != 0:
             self.samm.inAir = True
+        if self.timer.getTimeLeft() <= 0:
+            self.stop()
+        if self.dead == True:
+            self.ground.dy = self.door.dy = self.platform1.dy = self.platform2.dy = self.platform3.dy = self.platform4.dy = self.platform5.dy = self.platform6.dy = self.platform7.dy = self.enemy1.dy = self.enemy2.dy = self.enemy3.dy = self.enemy4.dy = self.enemy5.dy = self.enemy6.dy = self.enemy1.dx = self.enemy2.dx = self.enemy3.dx = self.enemy4.dx = self.enemy5.dx = self.enemy6.dx= 0
             
 class Boss(simpleGE.Sprite):
     def __init__(self, scene):
@@ -653,7 +661,7 @@ class Boss(simpleGE.Sprite):
         self.animRow3 = 3
     
     def checkBounds(self):
-        checkbounds = "overwriting checkbounds"
+        pass
 
     def process(self):
         if self.x > 100:
@@ -703,7 +711,7 @@ class Button(simpleGE.Sprite):
         self.position = (320, -100)
         
     def checkBounds(self):
-        checkbounds = "overwriting checkbounds"
+        pass
         
 class ButtonPressed(simpleGE.Sprite):
     def __init__(self, scene, pressed, type):
@@ -734,11 +742,8 @@ class BossFight(simpleGE.Scene):
         pressed = "no"
         
         self.sndSlows = simpleGE.Sound("slows.wav")
-        self.sndDoor = simpleGE.Sound("dies.wav")
-#         self.sndDoor = siimpleGE.Sound("door.wav")
         self.sndDies = simpleGE.Sound("dies.wav")
-        self.sndButton = simpleGE.Sound("dies.wav")
-#         self.sndButton = simpleGE.Sound("button.wav")
+        self.sndButton = simpleGE.Sound("button.wav")
         
         self.samm = Character(self, response)
         
@@ -849,27 +854,27 @@ def main():
             prevProgress = instructions.prevProgress
             begin = Begin(response)
             begin.start()
+            if begin.response == "play":
+                response = begin.response
+                play = Play(response, originalX, groundList, towerHeight)
+                play.start()
+            if play.response == "instructions":
+                response = play.response
+                prevProgress = play.prevProgress
+            if play.response == "bossFight":
+                response = play.response
+                bossFight = BossFight(response, prevProgress)
+                bossFight.start()
+            try:
+                if bossFight.response == "instructions":
+                    response = bossFight.response
+                    if bossFight.win == "win":
+                        prevProgress = bossFight.win
+                        bossFight.win = "not yet"
+            except:
+                prevProgress = play.prevProgress
         if instructions.response == "quit":
             keepGoing = False
-        if begin.response == "play":
-            response = begin.response
-            play = Play(response, originalX, groundList, towerHeight)
-            play.start()
-        if play.response == "instructions":
-            response = play.response
-            prevProgress = play.prevProgress
-        if play.response == "bossFight":
-            response = play.response
-            bossFight = BossFight(response, prevProgress)
-            bossFight.start()
-        try:
-            if bossFight.response == "instructions":
-                response = bossFight.response
-                if bossFight.win == "win":
-                    prevProgress = bossFight.win
-                    bossFight.win = "not yet"
-        except:
-            prevProgress = play.prevProgress            
             
 if __name__ == "__main__":
     main()
